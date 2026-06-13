@@ -98,6 +98,9 @@ build works at a domain root or under a `/<repo>/` GitHub Pages path.
   Upgrade path: `AudioWorklet`.
 - P2P falls back to a TURN relay on restrictive networks (none configured by
   default); for cross-network reliability add `turnConfig` to the Trystero room.
+- The layout is responsive and the knobs / loop handles are pointer-driven, so
+  it's fully usable on touch. Two desktop-only niceties degrade gracefully:
+  drag-and-drop (tap the bar to browse instead) and the hover help hints.
 - A peer that joins after the last audio-holder left won't get that track —
   inherent to the ephemeral P2P model.
 
