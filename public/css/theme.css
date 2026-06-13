@@ -30,9 +30,15 @@ a.button.active {
   color: #161c20;
 }
 
-/* ---- header (dark bar, coral logo, lime search) ---- */
+/* ---- header (dark bar, cyan logo, lime search) ---- */
 .header {
   background: #101518;
+}
+
+/* the logo wordmark PNG is white on transparent — the box behind it carries
+   the colour. Cyan instead of the redesign-era coral, to match the theme. */
+.header .logo {
+  background: #21c1e1;
 }
 
 .header .blend {
@@ -55,7 +61,9 @@ a.button.active {
 
 .session a.transport {
   color: #21c1e1;
-  background: #101518;
+  /* background-COLOR only — the shorthand would reset background-repeat to
+     'repeat' and tile the tiny play/stop icon into a grid. */
+  background-color: #101518;
 }
 
 .session input#session_title {
