@@ -106,6 +106,10 @@ build works at a domain root or under a `/<repo>/` GitHub Pages path.
 - A peer that joins after the last audio-holder left won't get that track —
   inherent to the ephemeral P2P model.
 
+## Credits
+
+- Design: [Daniel Althausen](https://www.behance.net/DanielAlthausen)
+
 ## License
 
 MIT.

@@ -361,7 +361,7 @@ export function App({ engine }: { engine: AudioEngine }) {
 
       <div className="footer">
         <div className="wrap">
-          <a href="https://github.com/" target="_blank" rel="noreferrer">
+          <a href="https://github.com/gherkins/mashcloud" target="_blank" rel="noreferrer">
             about / source
           </a>
         </div>
