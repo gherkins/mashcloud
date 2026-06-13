@@ -26,19 +26,15 @@ a.button {
 
 a.button:hover,
 a.button.active {
-  background: #c6f58d;
+  /* background-COLOR (not the shorthand) so the transport button — which also
+     carries .button — keeps its no-repeat icon on hover instead of tiling. */
+  background-color: #c6f58d;
   color: #161c20;
 }
 
-/* ---- header (dark bar, cyan logo, lime search) ---- */
+/* ---- header (dark bar, original coral logo, lime search) ---- */
 .header {
   background: #101518;
-}
-
-/* the logo wordmark PNG is white on transparent — the box behind it carries
-   the colour. Cyan instead of the redesign-era coral, to match the theme. */
-.header .logo {
-  background: #21c1e1;
 }
 
 .header .blend {
