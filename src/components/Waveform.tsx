@@ -33,12 +33,12 @@ export function Waveform({ engine, trackId, peaks, startMs, endMs, durationMs }:
     const startX = (startMs / durationMs) * WIDTH
     const endX = (endMs / durationMs) * WIDTH
 
-    // light waveform over the teal .wav background, dimmed outside the loop —
-    // echoes the original SoundCloud waveform-mask look.
+    // dark theme: cyan waveform (loud) over the dark .wav background, dimmed
+    // outside the loop — the original used innerColor #21C1E1 / outer #14404A.
     for (let x = 0; x < peaks.length && x < WIDTH; x++) {
       const h = peaks[x] * (HEIGHT * 0.95)
       const inLoop = x >= startX && x <= endX
-      ctx.strokeStyle = inLoop ? '#eaf6f4' : '#4f9f99'
+      ctx.strokeStyle = inLoop ? '#2bc6e6' : '#1d5a66'
       ctx.beginPath()
       ctx.moveTo(x + 0.5, mid - h / 2)
       ctx.lineTo(x + 0.5, mid + h / 2)

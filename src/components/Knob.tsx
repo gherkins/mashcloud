@@ -29,7 +29,7 @@ export function Knob({
   value = 0,
   min = 0,
   max = 100,
-  color = '#97d3d3',
+  color = '#21c1e1',
   onChange,
   onJog,
   sensitivity,
@@ -63,9 +63,9 @@ export function Knob({
     ctx.arc(cx, cy, radius + lineWidth - 1, 0, Math.PI * 2)
     ctx.stroke()
 
-    // track
+    // track (unfilled portion) — dark so only the cyan value arc pops
     ctx.lineWidth = lineWidth
-    ctx.strokeStyle = '#ffffff'
+    ctx.strokeStyle = '#2a3a42'
     ctx.beginPath()
     ctx.arc(cx, cy, radius, start, start + sweep)
     ctx.stroke()

@@ -1,0 +1,229 @@
+/* ===== mashcloud dark theme =====
+   The original 2012 look: near-black panels with cyan + lime accents.
+   Loaded after style.css / additions.css and overrides colors only, so the
+   light stylesheet stays intact and this file can be dropped to revert.
+   Palette: bg #161c20 · panel #101518 · cyan #21c1e1 · lime #c6f58d · green #6ad841 */
+
+/* ---- base ---- */
+body {
+  background: #161c20;
+  color: #e6edef;
+}
+
+a {
+  color: #21c1e1;
+}
+
+h2 {
+  color: #21c1e1;
+}
+
+/* buttons: lime outline, fill on hover/active */
+a.button {
+  border-color: #c6f58d;
+  color: #c6f58d;
+}
+
+a.button:hover,
+a.button.active {
+  background: #c6f58d;
+  color: #161c20;
+}
+
+/* ---- header (dark bar, coral logo, lime search) ---- */
+.header {
+  background: #101518;
+}
+
+.header .blend {
+  background: #0e1418;
+}
+
+.header input,
+.header input.add_track {
+  background-color: #c6f58d;
+}
+
+.header input::-webkit-input-placeholder {
+  color: #1d2a14;
+}
+
+/* ---- transport ---- */
+.session .top {
+  border-bottom-color: #2a3338;
+}
+
+.session a.transport {
+  color: #21c1e1;
+  background: #101518;
+}
+
+.session input#session_title {
+  background: #161c20;
+  color: #e6edef;
+}
+
+.session input#session_title:focus {
+  background: #0e1418;
+}
+
+/* ---- sidebar ---- */
+.session .sidebar .widget {
+  border-bottom-color: #2a3338;
+}
+
+.session .sidebar h4 {
+  color: #8aa7ab;
+}
+
+.sidebar .widget.help a.hide {
+  filter: invert(1) brightness(1.4);
+}
+
+.session .sidebar .users .user .status {
+  color: #21c1e1;
+}
+
+/* ---- tracks ---- */
+.session .tracks .track .wrap_narrow {
+  background: #101518;
+}
+
+.session .tracks .track a.remove {
+  color: #ff8a78;
+  /* the remove.png X is a dark glyph (invisible on the dark panel); drop it */
+  background-image: none;
+  padding-right: 0;
+}
+
+.session .tracks .track .preloader {
+  background: #0c2329;
+}
+
+.session .tracks .track .preloader .bar {
+  background: #21c1e1;
+}
+
+/* waveform container (peaks themselves are drawn in Waveform.tsx) */
+.session .tracks .track .wav {
+  background: #0e2a31;
+}
+
+.session .tracks .track .slider.loop .ui-slider-range {
+  background: #21c1e1;
+  border-left-color: #21c1e1;
+  border-right-color: #21c1e1;
+}
+
+/* ---- knobs ---- */
+.session .tracks .track .controls .knobs .knobcontainer.gain label,
+.session .tracks .track .controls .knobs .knobcontainer.pitch label,
+.session .tracks .track .controls .knobs .knobcontainer.range label {
+  color: #21c1e1;
+}
+
+/* ---- loop range controls ---- */
+.session .tracks .track .controls .loop {
+  border-top-color: #05333a;
+  border-bottom-color: #05333a;
+}
+
+.session .tracks .track .controls .loop a {
+  color: #8aa7ab;
+}
+
+.session .tracks .track .controls .loop[data-move='start'] a.loop_start,
+.session .tracks .track .controls .loop[data-move='end'] a.loop_end,
+.session .tracks .track .controls .loop[data-move='start'] a:hover,
+.session .tracks .track .controls .loop[data-move='end'] a:hover {
+  color: #21c1e1;
+}
+
+/* ---- track buttons: mute = green, solo = grey, master = white
+       (restores the original dark-theme button scheme) ---- */
+.session .tracks .track .controls .buttons .mute {
+  border-color: #6ad841;
+  color: #6ad841;
+}
+
+.session .tracks .track .controls .buttons .mute.active {
+  background: #6ad841;
+  color: #101518;
+}
+
+.session .tracks .track .controls .buttons .solo {
+  border-color: #e4e0df;
+  color: #e4e0df;
+}
+
+.session .tracks .track .controls .buttons .solo.active {
+  background: #e4e0df;
+  color: #101518;
+}
+
+.session .tracks .track .controls .buttons .master {
+  border-color: #fff;
+  color: #fff;
+}
+
+.session .tracks .track .controls .buttons .master.active {
+  background: #fff;
+  color: #101518;
+}
+
+/* ---- footer ---- */
+.footer {
+  background: #101518;
+}
+
+.footer a {
+  color: #21c1e1;
+}
+
+/* ===== new widgets (override additions.css for dark) ===== */
+
+/* engine-status lamp */
+.connection .off {
+  background: #36424a;
+}
+
+.connection .on {
+  background: #6ad841;
+}
+
+.connection .on.active {
+  box-shadow: 0 0 7px 1px #6ad841;
+}
+
+/* knob value readout */
+.knob-value {
+  color: #cfe0e0;
+}
+
+/* collaboration link + transfers */
+.sidebar .widget.collab .share-url {
+  background: #0c1114;
+  color: #cfe0e0;
+}
+
+.sidebar .widget.incoming .xfer {
+  background: #0c1114;
+}
+
+.sidebar .widget.incoming .xfer-pct {
+  color: #21c1e1;
+}
+
+.sidebar .widget.incoming .xfer-bar {
+  background: #21c1e1;
+}
+
+/* drag-and-drop feedback */
+.main.dragging .header input.add_track {
+  background-color: #d8f5a8;
+  outline-color: #21c1e1;
+}
+
+.main.dragging .tracks .quickstart {
+  outline-color: #21c1e1;
+}
