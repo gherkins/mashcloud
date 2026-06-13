@@ -1,5 +1,6 @@
 import { EngineTrack, type TrackSnapshot, type TrackMeta } from './EngineTrack'
 import { encodeWav } from './wav'
+import { findMpegFrameStart } from './mp3'
 
 /** How far ahead of a master-loop boundary we schedule the follower re-triggers,
  *  in seconds. Big enough to beat requestAnimationFrame jitter so the start lands
@@ -55,6 +56,8 @@ export class AudioEngine {
   // collaboration hooks (wired up by the Collab layer; null when solo)
   onLocalEdit?: (edit: Edit) => void
   onLocalTrackAdded?: (track: EngineTrack) => void
+  /** surfaced to the UI when a file can't be decoded (wired up by App) */
+  onError?: (message: string) => void
   private suppress = false
   private incoming = new Set<string>()
 
@@ -125,17 +128,22 @@ export class AudioEngine {
   async addFiles(files: FileList | File[]): Promise<void> {
     // Snapshot synchronously: a live FileList (input.files) can be cleared by
     // the caller resetting the input before the awaits below run.
-    const list = Array.from(files).filter((f) => f.type.startsWith('audio/') || /\.(wav|mp3|ogg|flac|m4a|aac)$/i.test(f.name))
+    const list = Array.from(files).filter(
+      (f) => f.type.startsWith('audio/') || /\.(wav|mp3|ogg|flac|m4a|aac|opus|weba|webm|aif|aiff|mp4)$/i.test(f.name),
+    )
     await this.resume()
     for (const file of list) {
       try {
-        const data = await file.arrayBuffer()
-        // keep a copy of the encoded bytes BEFORE decode (decodeAudioData
-        // detaches the ArrayBuffer); we re-send these bytes to peers.
-        const bytes = new Uint8Array(data.slice(0))
-        const buffer = await this.ctx.decodeAudioData(data)
+        const decoded = await this.decode(new Uint8Array(await file.arrayBuffer()))
+        if (!decoded) {
+          console.error(`could not decode ${file.name}`)
+          this.onError?.(`Couldn’t decode “${file.name}” — the file may be corrupted or in a format your browser can’t play.`)
+          continue
+        }
         const name = file.name.replace(/\.[^.]+$/, '')
-        const track = new EngineTrack(this, { name, buffer, bytes, master: this.tracks.length === 0 })
+        // decoded.bytes is the slice that actually decoded (junk trimmed); store
+        // those so the re-send to peers carries a clean, decodable stream.
+        const track = new EngineTrack(this, { name, buffer: decoded.buffer, bytes: decoded.bytes, master: this.tracks.length === 0 })
         this.tracks.push(track)
         track.applyGain()
         // if we're mid-playback, bring the newcomer in straight away; it locks
@@ -144,10 +152,39 @@ export class AudioEngine {
         // hand the new track (audio + meta) to peers
         this.onLocalTrackAdded?.(track)
       } catch (err) {
-        console.error(`could not decode ${file.name}`, err)
+        console.error(`could not read ${file.name}`, err)
+        this.onError?.(`Couldn’t read “${file.name}”.`)
       }
     }
     this.emit()
+  }
+
+  /**
+   * `decodeAudioData`, but forgiving of MP3s with junk before the first frame
+   * (corrupted/partial downloads) that the browser rejects with "unknown
+   * content type" even though VLC/ffmpeg/CoreAudio play them. On failure we scan
+   * for the first real frame, trim, and retry — exactly what those players do.
+   *
+   * Returns the decoded buffer together with the encoded bytes that actually
+   * decoded (trimmed if we had to resync), so callers store/broadcast the clean
+   * stream. Returns null if the bytes are genuinely undecodable.
+   *
+   * Note: `decodeAudioData` detaches its input ArrayBuffer, so we always hand it
+   * a throwaway copy and keep `bytes` intact for the retry.
+   */
+  private async decode(bytes: Uint8Array): Promise<{ buffer: AudioBuffer; bytes: Uint8Array } | null> {
+    try {
+      return { buffer: await this.ctx.decodeAudioData(bytes.slice().buffer), bytes }
+    } catch {
+      const start = findMpegFrameStart(bytes)
+      if (start <= 0) return null // not a recoverable MP3 (or already starts clean → retry is futile)
+      try {
+        const trimmed = bytes.slice(start)
+        return { buffer: await this.ctx.decodeAudioData(trimmed.slice().buffer), bytes: trimmed }
+      } catch {
+        return null
+      }
+    }
   }
 
   /** Rebuild a track from bytes received over the wire. Does not re-broadcast. */
@@ -157,13 +194,17 @@ export class AudioEngine {
     try {
       // decode works on a suspended context, so don't await resume() here — a
       // freshly-joined peer hasn't gestured yet and resume() could block.
-      const buffer = await this.ctx.decodeAudioData(bytes.slice().buffer)
+      const decoded = await this.decode(bytes)
+      if (!decoded) {
+        console.error(`could not decode received track ${meta.name}`)
+        return
+      }
       if (meta.master) for (const t of this.tracks) t.master = false
       const track = new EngineTrack(this, {
         id: meta.id,
         name: meta.name,
-        buffer,
-        bytes,
+        buffer: decoded.buffer,
+        bytes: decoded.bytes,
         startMs: meta.startMs,
         endMs: meta.endMs,
         gain: meta.gain,

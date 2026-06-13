@@ -44,8 +44,10 @@ npm install
 npm run dev      # http://localhost:5173
 ```
 
-Then drag some audio files (wav/mp3/ogg/flac/m4a) onto the page, or click the
-top bar to browse.
+Then drag some audio files (wav/mp3/ogg/flac/m4a/aac/opus/webm/aiff) onto the
+page, or click the top bar to browse. Whatever your browser's Web Audio decoder
+can handle works; MP3s with a corrupted/junk header (common with partial
+downloads) are repaired on the fly by resyncing to the first valid frame.
 
 ## Build / deploy
 

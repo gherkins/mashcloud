@@ -47,6 +47,7 @@ export function App({ engine }: { engine: AudioEngine }) {
   const [helpOpen, setHelpOpen] = useState(false)
   const [helpText, setHelpText] = useState('')
   const [dragging, setDragging] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // collaboration
   const collabRef = useRef<Collab | null>(null)
@@ -89,6 +90,19 @@ export function App({ engine }: { engine: AudioEngine }) {
     // run once on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // surface decode/read failures from the engine, then auto-dismiss
+  useEffect(() => {
+    engine.onError = (msg) => setError(msg)
+    return () => {
+      engine.onError = undefined
+    }
+  }, [engine])
+  useEffect(() => {
+    if (!error) return
+    const t = window.setTimeout(() => setError(null), 6000)
+    return () => window.clearTimeout(t)
+  }, [error])
 
   // spacebar = play/stop (unless typing in a field)
   useEffect(() => {
@@ -137,6 +151,11 @@ export function App({ engine }: { engine: AudioEngine }) {
       }}
       onDrop={onDrop}
     >
+      {error && (
+        <div className="toast error" role="alert" onClick={() => setError(null)} title="dismiss">
+          {error}
+        </div>
+      )}
       <div className={`main${dragging ? ' dragging' : ''}`} onMouseOver={onHelpOver} onMouseOut={onHelpOut}>
         <input ref={fileInput} type="file" accept="audio/*" multiple hidden onChange={onPickFiles} />
 
