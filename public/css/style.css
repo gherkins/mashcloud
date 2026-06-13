@@ -158,17 +158,6 @@ a.button.active:hover {
   padding-top: 60px;
 }
 
-.content.index a.chrome {
-  display: inline-block;
-  padding-right: 22px;
-  line-height: 16px;
-  background: url('../images/chrome_logo.png') right center no-repeat;
-}
-
-.content.index a.chrome:hover {
-  opacity: 1;
-}
-
 .content.index img.logo_index {
   margin: 40px 0 20px 0;
 }
@@ -229,17 +218,6 @@ a.button.active:hover {
 
 .session input#session_title:focus {
   background: #e4e0df;
-}
-
-.session a.soundcloud {
-  float: right;
-  color: #ff816a;
-  background: #fbfbfb;
-  border: none;
-  padding: 10px 10px 8px 55px;
-  background-position: 10px 5px;
-  background-repeat: no-repeat;
-  background-image: url('../images/soundcloud.png');
 }
 
 /*sidebar*/
@@ -676,10 +654,6 @@ a.button.active:hover {
   opacity: 0.4;
   color: #23afa6;
   text-decoration: none;
-}
-
-a.chrome span {
-  text-decoration: underline;
 }
 
 ul.ui-autocomplete {

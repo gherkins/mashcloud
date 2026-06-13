@@ -144,7 +144,7 @@ export function App({ engine }: { engine: AudioEngine }) {
           <div className="wrap">
             <div className="logo">
               <a href="#">
-                <img src="images/logo.png" alt="mashcloud" />
+                <img src={`${import.meta.env.BASE_URL}images/logo.png`} alt="mashcloud" />
               </a>
             </div>
             <input

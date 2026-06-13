@@ -1,10 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// base: './' keeps asset URLs relative so the same build works whether it is
-// served from the domain root or from a GitHub Pages project subpath
-// (https://<user>.github.io/mashcloud/).
-export default defineConfig({
-  base: './',
+// Deployed as a GitHub Pages *project* site under /mashcloud/ — served at
+// https://datenkatze.de/mashcloud/ via the account's custom domain. The
+// production build (and `preview`, so it mirrors prod) is prefixed with that
+// subpath; the dev server stays at root.
+export default defineConfig(({ command, isPreview }) => ({
+  base: command === 'build' || isPreview ? '/mashcloud/' : '/',
   plugins: [react()],
-})
+}))
