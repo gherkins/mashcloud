@@ -187,7 +187,13 @@ export function App({ engine }: { engine: AudioEngine }) {
                 ) : (
                   <>
                     <h4>session link</h4>
-                    <input className="share-url" readOnly value={window.location.href} onFocus={(e) => e.target.select()} />
+                    <input
+                      className="share-url"
+                      readOnly
+                      value={window.location.hash}
+                      title={window.location.href}
+                      onFocus={(e) => e.target.select()}
+                    />
                     <a
                       href="#"
                       className="button copy"
