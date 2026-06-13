@@ -63,9 +63,12 @@ build works at a domain root or under a `/<repo>/` GitHub Pages path.
   `AudioBufferSourceNode` is created on every (re)start (buffer sources are
   one-shot by spec).
 - Each source loops its own `[loopStart, loopEnd]` window.
-- One track is the **master**. A `requestAnimationFrame` loop watches the master
-  loop; when it wraps, every track is restarted in lock-step so they stay
-  phase-aligned — the same trick the 2012 app used.
+- One track is the **master**. It loops natively (seamless by spec); a
+  `requestAnimationFrame` scheduler projects its next loop boundary from the
+  audio clock and schedules every other track to re-trigger from its own
+  loopStart *exactly* on that boundary sample (a short lookahead lands the start
+  precisely), keeping them phase-locked to the master — the same trick the 2012
+  app used, but sample-accurate, so there's no seam on wrap.
 - The playhead is drawn imperatively per frame and never triggers a React
   render; React state only changes on structural edits (add/remove/gain/pitch/
   loop/mute/solo/transport).
@@ -93,8 +96,6 @@ build works at a domain root or under a `/<repo>/` GitHub Pages path.
 
 - Recording uses `ScriptProcessorNode` (deprecated but universally supported).
   Upgrade path: `AudioWorklet`.
-- Loop re-sync restarts sources at `currentTime + ~20ms`; sample-accurate
-  scheduling (lookahead) would remove the tiny seam on master wrap.
 - P2P falls back to a TURN relay on restrictive networks (none configured by
   default); for cross-network reliability add `turnConfig` to the Trystero room.
 - A peer that joins after the last audio-holder left won't get that track —

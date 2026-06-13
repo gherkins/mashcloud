@@ -1,6 +1,12 @@
 import { EngineTrack, type TrackSnapshot, type TrackMeta } from './EngineTrack'
 import { encodeWav } from './wav'
 
+/** How far ahead of a master-loop boundary we schedule the follower re-triggers,
+ *  in seconds. Big enough to beat requestAnimationFrame jitter so the start lands
+ *  on the exact sample; small enough that a master pitch/loop change rarely falls
+ *  inside the window (which would re-trigger followers a hair early/late). */
+const SCHEDULE_AHEAD_SEC = 0.1
+
 export interface EngineSnapshot {
   tracks: TrackSnapshot[]
   playing: boolean
@@ -43,7 +49,8 @@ export class AudioEngine {
   private playing = false
   private rafId = 0
   private transportStartTime = 0
-  private lastMasterPhase = 0
+  /** true once the upcoming master boundary's follower re-triggers are scheduled */
+  private boundaryArmed = false
 
   // collaboration hooks (wired up by the Collab layer; null when solo)
   onLocalEdit?: (edit: Edit) => void
@@ -293,7 +300,7 @@ export class AudioEngine {
     await this.resume()
     const when = this.ctx.currentTime + 0.06
     this.transportStartTime = when
-    this.lastMasterPhase = 0
+    this.boundaryArmed = false
     for (const t of this.tracks) t.play(when)
     this.playing = true
     this.loop()
@@ -314,30 +321,42 @@ export class AudioEngine {
     else void this.play()
   }
 
-  /** restart every track in lock-step — used when the master loop wraps. */
-  private restartAll(): void {
-    const when = this.ctx.currentTime + 0.02
-    this.transportStartTime = when
-    this.lastMasterPhase = 0
-    for (const t of this.tracks) t.play(when)
-  }
-
+  /**
+   * Master-clock scheduler. The master track loops natively (seamless by spec)
+   * and is never restarted — that backward jump was the old seam. Instead we
+   * project its next loop boundary from the audio clock and schedule every
+   * *follower* to re-trigger from its own loopStart exactly on that boundary
+   * sample, a short lookahead ahead so Web Audio places the start precisely.
+   * transportStartTime tracks the current master cycle's start and doubles as
+   * the playhead anchor.
+   */
   private loop = (): void => {
     if (!this.playing) return
     this.rafId = requestAnimationFrame(this.loop)
 
-    const elapsedMs = (this.ctx.currentTime - this.transportStartTime) * 1000
-    if (elapsedMs < 0) return
+    const now = this.ctx.currentTime
+    if (now < this.transportStartTime) return // pre-roll before the first start
 
     const master = this.tracks.find((t) => t.master)
-    if (master) {
-      const masterElapsed = elapsedMs * master.playbackRate
-      const phase = masterElapsed % master.loopLenMs
-      if (phase < this.lastMasterPhase) {
-        this.restartAll()
-        return
-      }
-      this.lastMasterPhase = phase
+    if (!master) return
+
+    const periodSec = master.loopLenMs / master.playbackRate / 1000
+    let boundary = this.transportStartTime + periodSec
+
+    // Arm the upcoming boundary exactly once: schedule the followers to
+    // re-trigger on it. The master is left alone to keep looping natively.
+    if (!this.boundaryArmed && boundary > now && boundary <= now + SCHEDULE_AHEAD_SEC) {
+      for (const t of this.tracks) if (!t.master) t.play(boundary)
+      this.boundaryArmed = true
+    }
+
+    // Advance the cycle anchor once the boundary has passed. The while-loop
+    // skips any cycles we blew past (e.g. a backgrounded tab) without
+    // machine-gunning a re-trigger for each missed one.
+    while (now >= boundary) {
+      this.transportStartTime = boundary
+      this.boundaryArmed = false
+      boundary += periodSec
     }
   }
 
