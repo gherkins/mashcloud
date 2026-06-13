@@ -1,0 +1,131 @@
+/* Small additions on top of the original style.css — only what the rebuild
+   needs (drop-zone feedback, the canvas knob value, clickable cursors). */
+
+#root {
+  height: 100%;
+}
+
+/* the repurposed search bar now opens the file picker */
+.header input.add_track {
+  cursor: pointer;
+}
+
+/* drag-and-drop feedback */
+.main.dragging .header input.add_track {
+  background-color: #d7ebe9;
+  outline: 2px dashed #23afa6;
+  outline-offset: -2px;
+}
+
+.main.dragging .tracks .quickstart {
+  outline: 2px dashed #23afa6;
+  border-radius: 10px;
+  padding: 11px 10px;
+}
+
+/* anchors that act as buttons (no href) need a pointer */
+a.button,
+a.transport,
+.tracks .track a.remove,
+.tracks .track .controls .loop a,
+.tracks .track .controls .buttons a,
+.sidebar .widget.help a {
+  cursor: pointer;
+}
+
+/* canvas knob value, centered over the dial */
+.knob-wrap {
+  display: inline-block;
+}
+
+.knob-value {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  transform: translateY(-50%);
+  text-align: center;
+  font-family: Collator, sans-serif;
+  font-size: 13px;
+  color: #535152;
+  pointer-events: none;
+}
+
+/* the knobs are now canvas elements; keep them centered in their containers */
+.session .tracks .track .controls .knobs .knobcontainer .knob-wrap canvas {
+  display: block;
+  margin: 0 auto;
+}
+
+/* help text readability */
+.sidebar .widget.help .helptext p {
+  line-height: 16px;
+}
+
+/* engine-status lamp: neutral until the AudioContext is live, then glow green.
+   (no more coral "alarm" dot before the first interaction) */
+.connection .off {
+  background: #c5c1c0;
+}
+
+.connection .on.active {
+  box-shadow: 0 0 7px 1px #8ac6c6;
+}
+
+/* ---- collaboration widgets ---- */
+
+.sidebar .widget.collab .button.share {
+  line-height: 14px;
+}
+
+.sidebar .widget.collab .share-url {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  border: none;
+  background: #f4f0ef;
+  color: #535152;
+  font-family: Collator, sans-serif;
+  font-size: 11px;
+  padding: 6px 8px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+
+.sidebar .widget.collab .button.copy {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+/* incoming audio transfers (reuses the spirit of the old per-track preloader) */
+.sidebar .widget.incoming .xfer {
+  position: relative;
+  overflow: hidden;
+  background: #f4f0ef;
+  border-radius: 4px;
+  padding: 6px 8px;
+  margin-bottom: 5px;
+}
+
+.sidebar .widget.incoming .xfer-name {
+  display: inline-block;
+  max-width: 95px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.sidebar .widget.incoming .xfer-pct {
+  float: right;
+  color: #ff816a;
+}
+
+.sidebar .widget.incoming .xfer-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  background: #23afa6;
+  transition: width 0.15s linear;
+}
